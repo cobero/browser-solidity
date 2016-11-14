@@ -308,13 +308,16 @@ UniversalDApp.prototype.getInstanceInterface = function (contract, address, $tar
     $instance.append($title)
 
     // Add the fallback function
-    $instance.append(self.getCallButton({
-      abi: { constant: false, inputs: [], name: '(fallback)', outputs: [], type: 'function' },
-      encode: function (args) {
-        return ''
-      },
-      address: address
-    }))
+    var fallback = self.getFallbackInterface(abi)
+    if (fallback) {
+      $instance.append(self.getCallButton({
+        abi: { constant: false, inputs: [], name: '(fallback)', outputs: [], type: 'function' },
+        encode: function (args) {
+          return ''
+        },
+        address: address
+      }))
+    }
 
     $.each(abi, function (i, funABI) {
       if (funABI.type !== 'function') {
@@ -366,6 +369,14 @@ UniversalDApp.prototype.getInstanceInterface = function (contract, address, $tar
 UniversalDApp.prototype.getConstructorInterface = function (abi) {
   for (var i = 0; i < abi.length; i++) {
     if (abi[i].type === 'constructor') {
+      return abi[i]
+    }
+  }
+}
+
+UniversalDApp.prototype.getFallbackInterface = function (abi) {
+  for (var i = 0; i < abi.length; i++) {
+    if (abi[i].type === 'fallback') {
       return abi[i]
     }
   }
