@@ -190,7 +190,9 @@ UniversalDApp.prototype.getCreateInterface = function ($container, contract) {
   $createInterface.append($atButton)
 
   var $newButton = self.getInstanceInterface(contract)
-  $createInterface.append($newButton)
+  if ($newButton) {
+    $createInterface.append($newButton)
+  }
 
   // Only display creation interface for non-abstract contracts.
   // FIXME: maybe have a flag for this in the JSON?
@@ -222,7 +224,12 @@ UniversalDApp.prototype.getInstanceInterface = function (contract, address, $tar
       return 1
     }
   })
+
   var funABI = self.getConstructorInterface(abi)
+  if (!funABI) {
+    return
+  }
+
   var $createInterface = $('<div class="createContract"/>')
 
   var appendFunctions = function (address, $el) {
@@ -356,16 +363,12 @@ UniversalDApp.prototype.getInstanceInterface = function (contract, address, $tar
   return $createInterface
 }
 
-// either return the supplied constructor or a mockup (we assume everything can be instantiated)
 UniversalDApp.prototype.getConstructorInterface = function (abi) {
-  var funABI = { 'name': '', 'inputs': [], 'type': 'constructor', 'outputs': [] }
   for (var i = 0; i < abi.length; i++) {
     if (abi[i].type === 'constructor') {
-      funABI.inputs = abi[i].inputs || []
-      break
+      return abi[i]
     }
   }
-  return funABI
 }
 
 UniversalDApp.prototype.getCallButton = function (args) {
